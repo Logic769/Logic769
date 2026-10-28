@@ -4,16 +4,11 @@
 
 <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&pause=1200&color=4D6BFE&center=true&vCenter=true&width=620&lines=Encrypted%20DNS%20%26%20anti-poisoning%20stacks%3BAdGuard%20Home%20rule%20automation%3BAI%20token%20usage%20tooling%20for%20coding%20agents" alt="what I work on" /></a>
 
-把家里的网络做干净，让 AI 的账单看得见。<br />
-<sub>quiet network, visible token bill</sub>
-
 <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=tokens" alt="total tokens" /></a> <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=cost" alt="total cost" /></a> <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=rank" alt="rank" /></a>
 
-本周 <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=tokens&period=week" alt="tokens this week" /></a>
+<a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=tokens&period=week" alt="tokens this week" /></a>
 
 </div>
-
-## 📈 数据
 
 <div align="center">
 
@@ -40,7 +35,6 @@
   <img width="100%" src="https://raw.githubusercontent.com/Logic769/Logic769/output/github-snake.svg" alt="contribution snake" />
 </picture>
 
-<sub>上面四枚徽章是 <a href="https://github.com/xiufengsun/TokenTracker">TokenTracker</a> 统计的我的 AI 编程用量（token / 本周 / 花费 / 全球排名，60 秒刷新）。</sub>
 
 <img src="https://komarev.com/ghpvc/?username=Logic769&style=flat-square" alt="profile views" />
 
