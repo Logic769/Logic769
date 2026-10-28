@@ -33,8 +33,6 @@
   <img width="100%" src="https://raw.githubusercontent.com/Logic769/Logic769/output/github-snake.svg" alt="contribution snake" />
 </picture>
 
-<sub>上面四枚徽章是 <a href="https://github.com/xiufengsun/TokenTracker">TokenTracker</a> 统计的我的 AI 编程用量（token / 本周 / 花费 / 全球排名，60 秒刷新）。</sub>
-
 <img src="https://komarev.com/ghpvc/?username=Logic769&style=flat-square" alt="profile views" />
 
 </div>
