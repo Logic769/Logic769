@@ -2,12 +2,7 @@
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:4D6BFE,100:059669&height=150&section=header&text=Logic769&fontSize=44&fontColor=ffffff&fontAlignY=38&desc=Encrypted%20DNS%20%C2%B7%20AI%20tooling%20%C2%B7%20Network%20automation&descAlignY=58&descSize=15" alt="Logic769" width="100%" />
 
-把家里的网络做干净，让 AI 的账单看得见。<br />
-<sub>quiet network, visible token bill</sub>
-
 <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=tokens" alt="total tokens" /></a> <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=cost" alt="total cost" /></a> <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=rank" alt="rank" /></a>
-
-本周 <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=tokens&period=week" alt="tokens this week" /></a>
 
 </div>
 
