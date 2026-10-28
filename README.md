@@ -7,7 +7,9 @@
 把家里的网络做干净，让 AI 的账单看得见。<br />
 <sub>quiet network, visible token bill</sub>
 
-<a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=tokens" alt="tokens" /></a> <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=tokens&period=week" alt="tokens this week" /></a> <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=cost" alt="cost" /></a> <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=rank" alt="rank" /></a>
+<a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=tokens" alt="total tokens" /></a> <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=cost" alt="total cost" /></a> <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=rank" alt="rank" /></a>
+
+本周 <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=tokens&period=week" alt="tokens this week" /></a>
 
 <img src="https://skillicons.dev/icons?i=python,go,js,c,cs,linux,docker&theme=dark&perline=7" alt="tech stack" height="48" />
 
