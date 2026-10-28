@@ -11,17 +11,7 @@
 
 本周 <a href="https://github.com/Logic769/dns-guard-stack"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=tokens&period=week" alt="tokens this week" /></a>
 
-<img src="https://skillicons.dev/icons?i=python,go,js,c,cs,linux,docker&theme=dark&perline=7" alt="tech stack" height="48" />
-
 </div>
-
-## 🧭 我在折腾什么
-
-| | 方向 | 一句话 |
-| :-: | --- | --- |
-| 🛡️ | **抗投毒 DNS** | 全加密上游 + DNSSEC 优先 + 国内路由/信任分离，一条命令起一整套解析链 |
-| 🧹 | **规则自动化** | 多来源 AdGuard Home 规则自动合并去重，黑白名单分离，冲突单独列出 |
-| 🤖 | **AI 用量可见** | 本地优先的 token / 成本统计，任务栏随时能看，从不读取 prompt 内容 |
 
 ## 📦 精选项目
 
