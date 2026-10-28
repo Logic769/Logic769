@@ -13,18 +13,6 @@
 
 </div>
 
-## 📦 精选项目
-
-| 项目 | 说明 | 语言 |
-| --- | --- | :-: |
-| [**dns-guard-stack**](https://github.com/Logic769/dns-guard-stack) | 抗投毒 DNS 解析栈：DoT/DoH + AdGuard Home + Unbound + guard/verifier，一条命令部署 | `Python` |
-| [**AdguardHome-Rules**](https://github.com/Logic769/AdguardHome-Rules) | GitHub Actions 自动合并、去重多来源规则，并拆出混在黑名单里的白名单条目 | `Python` |
-| [**litemonitor-tokentracker**](https://github.com/Logic769/litemonitor-tokentracker) | LiteMonitor 插件：在 Windows 任务栏显示 AI 编程的 token 用量与花费 | `JavaScript` |
-| [**dsh-web-search-firecrawl**](https://github.com/Logic769/dsh-web-search-firecrawl) | 给 DeepSeek Harness 用的 Firecrawl 检索 provider（走 `POST /search` 而非兼容端点） | `JavaScript` |
-| [**news-crawler**](https://github.com/Logic769/news-crawler) | 基于 GNE 的多站点新闻抓取与正文抽取 | `Python` |
-
-> 也维护了几个 fork：[TokenTracker](https://github.com/Logic769/TokenTracker)（补上了 DeepSeek Harness 的会话级统计）、[ARTEX](https://github.com/Logic769/ARTEX)、[TaskbarLyrics](https://github.com/Logic769/TaskbarLyrics) 等。
-
 ## 📈 数据
 
 <div align="center">
@@ -44,6 +32,12 @@
   <source media="(prefers-color-scheme: dark)" srcset="https://streak-stats.demolab.com?user=Logic769&theme=tokyonight&hide_border=true" />
   <source media="(prefers-color-scheme: light)" srcset="https://streak-stats.demolab.com?user=Logic769&theme=default&hide_border=true" />
   <img height="165" src="https://streak-stats.demolab.com?user=Logic769&theme=tokyonight&hide_border=true" alt="contribution streak" />
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Logic769/Logic769/output/github-snake-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Logic769/Logic769/output/github-snake.svg" />
+  <img width="100%" src="https://raw.githubusercontent.com/Logic769/Logic769/output/github-snake.svg" alt="contribution snake" />
 </picture>
 
 <sub>上面四枚徽章是 <a href="https://github.com/xiufengsun/TokenTracker">TokenTracker</a> 统计的我的 AI 编程用量（token / 本周 / 花费 / 全球排名，60 秒刷新）。</sub>
