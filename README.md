@@ -6,8 +6,6 @@
 
 </div>
 
-## 📈 数据
-
 <div align="center">
 
 <picture>
