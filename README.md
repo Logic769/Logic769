@@ -1,10 +1,6 @@
 <div align="center">
 
-<a href="https://ghfind.com/u/Logic769"><picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://ghfind.com/api/card/logic769?theme=dark&amp;v=1793287177" />
-  <source media="(prefers-color-scheme: light)" srcset="https://ghfind.com/api/card/logic769?theme=light&amp;v=1793287177" />
-  <img width="840" src="https://ghfind.com/api/card/logic769?theme=dark&amp;v=1793287177" alt="ghfind developer card" />
-</picture></a>
+<a href="https://ghfind.com/u/Logic769"><img width="840" src="https://ghfind.com/api/card/mini/logic769?variant=radar&amp;theme=auto&amp;lang=zh&amp;v=1793287506" alt="ghfind developer card" /></a>
 
 </div>
 
