@@ -9,9 +9,9 @@
 <div align="center">
 
 <a href="https://ghfind.com/u/Logic769"><picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://ghfind.com/api/card/logic769?theme=dark&amp;v=1793286821" />
-  <source media="(prefers-color-scheme: light)" srcset="https://ghfind.com/api/card/logic769?theme=light&amp;v=1793286821" />
-  <img width="720" src="https://ghfind.com/api/card/logic769?theme=dark&amp;v=1793286821" alt="ghfind developer card" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://ghfind.com/api/card/logic769?theme=dark&amp;v=1793286922" />
+  <source media="(prefers-color-scheme: light)" srcset="https://ghfind.com/api/card/logic769?theme=light&amp;v=1793286922" />
+  <img width="720" src="https://ghfind.com/api/card/logic769?theme=dark&amp;v=1793286922" alt="ghfind developer card" />
 </picture></a>
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/stats-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="assets/stats-light.svg" /><img width="420" src="assets/stats-dark.svg" alt="GitHub stats" /></picture><picture><source media="(prefers-color-scheme: dark)" srcset="assets/top-langs-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="assets/top-langs-light.svg" /><img width="420" src="assets/top-langs-dark.svg" alt="most used languages" /></picture>
