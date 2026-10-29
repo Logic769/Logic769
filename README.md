@@ -2,11 +2,17 @@
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:4D6BFE,100:059669&height=150&section=header&text=Logic769&fontSize=44&fontColor=ffffff&fontAlignY=38&desc=Encrypted%20DNS%20%C2%B7%20AI%20tooling%20%C2%B7%20Network%20automation&descAlignY=58&descSize=15" alt="Logic769" width="100%" />
 
-<a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=tokens" alt="total tokens" /></a> <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=cost" alt="total cost" /></a> <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=rank" alt="rank" /></a>
+<a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=tokens" alt="total tokens" /></a> <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=cost" alt="total cost" /></a> <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=rank" alt="rank" /></a> <a href="https://ghfind.com/u/Logic769"><img src="https://ghfind.com/api/badge/logic769" alt="ghfind score" /></a>
 
 </div>
 
 <div align="center">
+
+<a href="https://ghfind.com/u/Logic769"><picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://ghfind.com/api/card/logic769?theme=dark&amp;v=1793286821" />
+  <source media="(prefers-color-scheme: light)" srcset="https://ghfind.com/api/card/logic769?theme=light&amp;v=1793286821" />
+  <img width="720" src="https://ghfind.com/api/card/logic769?theme=dark&amp;v=1793286821" alt="ghfind developer card" />
+</picture></a>
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/stats-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="assets/stats-light.svg" /><img width="420" src="assets/stats-dark.svg" alt="GitHub stats" /></picture><picture><source media="(prefers-color-scheme: dark)" srcset="assets/top-langs-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="assets/top-langs-light.svg" /><img width="420" src="assets/top-langs-dark.svg" alt="most used languages" /></picture>
 

@@ -429,8 +429,8 @@ def render_repos(t, repos, width=420, height=200):
             'fill="%s">%s</text>\n' % (y, FONT, t["text"], esc(name))
         )
         body += (
-            '  <text x="394" y="%d" font-family=\'%s\' font-size="10.5" text-anchor="end" '
-            'fill="%s">%s</text>\n' % (y, FONT, t["muted"], esc(meta))
+            '  <text x="%d" y="%d" font-family=\'%s\' font-size="10.5" text-anchor="end" '
+            'fill="%s">%s</text>\n' % (width - 26, y, FONT, t["muted"], esc(meta))
         )
     body += "</svg>\n"
     return body
@@ -525,6 +525,24 @@ def main():
     if written == 0:
         print("[error] every card was skipped; failing so the workflow turns red", file=sys.stderr)
         sys.exit(1)
+
+    refresh_embed_stamp()
+
+
+GHFIND_STAMP_RE = re.compile(r'(api/card/(?:mini/)?[A-Za-z0-9_-]+\?[^"\s)]*?\bv=)(\d+)')
+
+
+def refresh_embed_stamp():
+    """Bump the ghfind card's cache-busting v= so camo re-fetches on every run."""
+    readme = ROOT / "README.md"
+    if not readme.exists():
+        return
+    text = readme.read_text(encoding="utf-8")
+    stamp = str(int(time.time()))
+    updated = GHFIND_STAMP_RE.sub(lambda m: m.group(1) + stamp, text)
+    if updated != text:
+        readme.write_text(updated, encoding="utf-8")
+        print("[info] bumped ghfind embed stamp to %s" % stamp, file=sys.stderr)
 
 
 if __name__ == "__main__":
