@@ -239,6 +239,8 @@ def title_block(t, text, x=26, y=36):
 
 
 def render_stats(t, data, width=420, height=200):
+    if data.get("followers") is None and data.get("repos") is None:
+        return None  # API unreachable: keep whatever is already committed
     body = svg_open(width, height, t, "GitHub stats")
     body += title_block(t, "GitHub Stats")
     cells = [
@@ -273,6 +275,8 @@ def _fmt(value):
 
 
 def render_languages(t, langs, width=420, height=200):
+    if not langs:
+        return None
     body = svg_open(width, height, t, "Most used languages")
     body += title_block(t, "Most Used Languages")
     body += (
@@ -305,6 +309,8 @@ def render_languages(t, langs, width=420, height=200):
 
 
 def render_streak(t, streak, width=420, height=200):
+    if not streak:
+        return None
     current, longest, total = streak
     body = svg_open(width, height, t, "Contribution streak")
     body += title_block(t, "Contribution Streak")
@@ -334,6 +340,8 @@ def render_streak(t, streak, width=420, height=200):
 
 
 def render_repos(t, repos, width=420, height=200):
+    if not repos:
+        return None
     body = svg_open(width, height, t, "Recently updated repositories")
     body += title_block(t, "Recently Updated")
     if not repos:
@@ -362,6 +370,8 @@ def render_repos(t, repos, width=420, height=200):
 
 
 def render_activity(t, events, width=840, height=176):
+    if not events:
+        return None
     body = svg_open(width, height, t, "Recent activity")
     body += title_block(t, "Recent Activity")
     if not events:
@@ -414,7 +424,7 @@ def main():
         followers=user.get("followers"),
         repos=user.get("public_repos"),
     )
-    streak = compute_streaks(daily)
+    streak = compute_streaks(daily) if daily else None
     print(
         "[info] stars=%s commits=%s prs=%s issues=%s followers=%s repos=%s | streak=%s calendar_total=%s events=%d"
         % (data["stars"], data["commits"], data["prs"], data["issues"], data["followers"], data["repos"],
@@ -432,6 +442,9 @@ def main():
             "activity": render_activity(theme, events),
         }
         for name, svg in outputs.items():
+            if svg is None:
+                print("[warn] skip %s-%s: no data, keeping existing file" % (name, theme_name), file=sys.stderr)
+                continue
             path = OUT_DIR / ("%s-%s.svg" % (name, theme_name))
             path.write_text(svg, encoding="utf-8")
             print("wrote %s (%d bytes)" % (path.relative_to(ROOT), len(svg)), file=sys.stderr)
