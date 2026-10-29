@@ -1,11 +1,5 @@
 <div align="center">
 
-<a href="https://ghfind.com/u/Logic769"><img width="840" src="https://ghfind.com/api/card/mini/logic769?variant=radar&amp;theme=auto&amp;lang=zh&amp;v=1793287506" alt="ghfind developer card" /></a>
-
-</div>
-
-<div align="center">
-
 <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=tokens" alt="total tokens" /></a> <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=cost" alt="total cost" /></a> <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=bb0f0667-4a6a-45d5-9a53-e882b7cf82f2&metric=rank" alt="rank" /></a> <a href="https://ghfind.com/u/Logic769"><img src="https://ghfind.com/api/badge/logic769" alt="ghfind score" /></a>
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/stats-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="assets/stats-light.svg" /><img width="420" src="assets/stats-dark.svg" alt="GitHub stats" /></picture><picture><source media="(prefers-color-scheme: dark)" srcset="assets/top-langs-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="assets/top-langs-light.svg" /><img width="420" src="assets/top-langs-dark.svg" alt="most used languages" /></picture>
