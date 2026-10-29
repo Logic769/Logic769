@@ -39,4 +39,6 @@ jobs:
           fi
           git add assets
           git commit -m "chore: refresh profile cards [skip ci]"
+          # main may have moved while this job was generating; replay onto it before pushing.
+          git pull --rebase origin main
           git push

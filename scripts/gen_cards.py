@@ -84,6 +84,8 @@ def collect_repos():
     repos = []
     for page in range(1, 4):
         chunk = get_json(API + "/users/" + LOGIN + "/repos?per_page=100&page=%d&sort=pushed" % page)
+        if chunk is None:
+            return None  # API failure must not be reported as "zero repositories"
         if not chunk:
             break
         repos.extend(chunk)
@@ -104,7 +106,7 @@ def collect_contributions():
     """Return {date(str) -> count} and total from the public calendar page."""
     html = get_text("https://github.com/users/" + LOGIN + "/contributions")
     if not html:
-        return {}, 0
+        return None, 0
     id_to_date = {}
     for td in re.findall(r"<td[^>]*>", html):
         if "ContributionCalendar-day" not in td:
@@ -123,8 +125,14 @@ def collect_contributions():
         text = re.sub(r"<[^>]+>", "", m.group(2)).strip()
         hit = re.match(r"(\d[\d,]*)\s+contribution", text)
         daily[date] = int(hit.group(1).replace(",", "")) if hit else 0
-    if not daily:
-        print("[warn] contribution calendar parsed empty", file=sys.stderr)
+    # The public calendar is a fixed 53-week grid (~369 cells). Fewer cells means the
+    # page markup changed or was truncated, not that the user has no contributions.
+    if len(daily) < 350:
+        print(
+            "[warn] contribution calendar incomplete (%d cells), skipping streak card" % len(daily),
+            file=sys.stderr,
+        )
+        return None, 0
     return daily, sum(daily.values())
 
 
@@ -145,12 +153,16 @@ def compute_streaks(daily):
         current += 1
         cursor -= timedelta(days=1)
     longest = run = 0
-    for date in sorted(daily):
-        if daily[date] > 0:
-            run += 1
+    previous = None
+    for key in sorted(daily):
+        day = datetime.strptime(key, "%Y-%m-%d").date()
+        if daily[key] > 0:
+            run = run + 1 if previous is not None and day == previous + timedelta(days=1) else 1
             longest = max(longest, run)
+            previous = day
         else:
             run = 0
+            previous = None
     return current, longest, sum(daily.values())
 
 
@@ -239,8 +251,9 @@ def title_block(t, text, x=26, y=36):
 
 
 def render_stats(t, data, width=420, height=200):
-    if data.get("followers") is None and data.get("repos") is None:
-        return None  # API unreachable: keep whatever is already committed
+    for key in ("stars", "commits", "prs", "issues", "followers", "repos"):
+        if data.get(key) is None:
+            return None  # incomplete data: keep whatever is already committed
     body = svg_open(width, height, t, "GitHub stats")
     body += title_block(t, "GitHub Stats")
     cells = [
@@ -401,7 +414,7 @@ def main():
     daily, calendar_total = collect_contributions()
     events = collect_events()
 
-    own = [r for r in repos if not r.get("fork")]
+    own = [r for r in repos if not r.get("fork")] if repos is not None else []
     recent = sorted(
         [r for r in own if not r.get("archived")],
         key=lambda r: r.get("pushed_at") or "",
@@ -417,14 +430,16 @@ def main():
     langs_pct = [(name, count * 100.0 / total_lang) for name, count in ranked]
 
     data = dict(
-        stars=sum(r.get("stargazers_count", 0) for r in repos),
-        commits=search_total("author:" + LOGIN, kind="commits"),
-        prs=search_total("author:%s type:pr" % LOGIN),
-        issues=search_total("author:%s type:issue" % LOGIN),
+        stars=sum(r.get("stargazers_count", 0) for r in repos) if repos is not None else None,
+        # is:public keeps private-repo activity out of a public profile card and makes
+        # the count identical no matter which token runs the job.
+        commits=search_total("author:%s is:public" % LOGIN, kind="commits"),
+        prs=search_total("author:%s is:public type:pr" % LOGIN),
+        issues=search_total("author:%s is:public type:issue" % LOGIN),
         followers=user.get("followers"),
         repos=user.get("public_repos"),
     )
-    streak = compute_streaks(daily) if daily else None
+    streak = compute_streaks(daily) if daily else None  # daily is None when parsing failed
     print(
         "[info] stars=%s commits=%s prs=%s issues=%s followers=%s repos=%s | streak=%s calendar_total=%s events=%d"
         % (data["stars"], data["commits"], data["prs"], data["issues"], data["followers"], data["repos"],
@@ -433,6 +448,7 @@ def main():
     )
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
+    written = 0
     for theme_name, theme in THEMES.items():
         outputs = {
             "stats": render_stats(theme, data),
@@ -446,8 +462,15 @@ def main():
                 print("[warn] skip %s-%s: no data, keeping existing file" % (name, theme_name), file=sys.stderr)
                 continue
             path = OUT_DIR / ("%s-%s.svg" % (name, theme_name))
-            path.write_text(svg, encoding="utf-8")
+            tmp = path.with_suffix(".svg.tmp")
+            tmp.write_text(svg, encoding="utf-8")
+            tmp.replace(path)  # atomic: never leave a half-written card behind
+            written += 1
             print("wrote %s (%d bytes)" % (path.relative_to(ROOT), len(svg)), file=sys.stderr)
+
+    if written == 0:
+        print("[error] every card was skipped; failing so the workflow turns red", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

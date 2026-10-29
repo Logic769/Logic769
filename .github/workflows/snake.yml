@@ -5,6 +5,13 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    paths:
+      - ".github/workflows/snake.yml"
+
+concurrency:
+  group: snake
+  cancel-in-progress: true
+
 jobs:
   generate:
     runs-on: ubuntu-latest
