@@ -4,17 +4,17 @@
   <text x="22" y="86" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" fill="#565f89">Total Stars</text>
   <text x="132" y="89" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="18" font-weight="700" text-anchor="end" fill="#c0caf5">2</text>
   <text x="168" y="86" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" fill="#565f89">Commits</text>
-  <text x="278" y="89" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="18" font-weight="700" text-anchor="end" fill="#c0caf5">145</text>
+  <text x="278" y="89" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="18" font-weight="700" text-anchor="end" fill="#c0caf5">147</text>
   <text x="22" y="126" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" fill="#565f89">Pull Requests</text>
-  <text x="132" y="129" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="18" font-weight="700" text-anchor="end" fill="#c0caf5">111</text>
+  <text x="132" y="129" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="18" font-weight="700" text-anchor="end" fill="#c0caf5">143</text>
   <text x="168" y="126" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" fill="#565f89">Issues</text>
   <text x="278" y="129" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="18" font-weight="700" text-anchor="end" fill="#c0caf5">0</text>
   <text x="22" y="166" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" fill="#565f89">Followers</text>
   <text x="132" y="169" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="18" font-weight="700" text-anchor="end" fill="#c0caf5">2</text>
   <text x="168" y="166" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" fill="#565f89">Repositories</text>
-  <text x="278" y="169" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="18" font-weight="700" text-anchor="end" fill="#c0caf5">53</text>
+  <text x="278" y="169" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="18" font-weight="700" text-anchor="end" fill="#c0caf5">55</text>
   <circle cx="364" cy="110" r="32" fill="none" stroke="#24283b" stroke-width="5"/>
-  <circle cx="364" cy="110" r="32" fill="none" stroke="#7aa2f7" stroke-width="5" stroke-linecap="round" stroke-dasharray="50.9 150.1" transform="rotate(-90 364 110)"/>
+  <circle cx="364" cy="110" r="32" fill="none" stroke="#7aa2f7" stroke-width="5" stroke-linecap="round" stroke-dasharray="55.2 145.9" transform="rotate(-90 364 110)"/>
   <text x="364" y="117" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="20" font-weight="700" text-anchor="middle" fill="#c0caf5">B-</text>
   <text x="364" y="157" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="9" letter-spacing="1.2" text-anchor="middle" fill="#565f89">RANK</text>
 </svg>
