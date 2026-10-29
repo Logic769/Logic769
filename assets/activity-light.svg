@@ -2,18 +2,18 @@
   <rect x="0.5" y="0.5" width="839" height="175" rx="10" fill="#ffffff" stroke="#d8dee4"/>
   <text x="26" y="36" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="14" font-weight="700" fill="#4d6bfe">Recent Activity</text>
   <circle cx="30" cy="64" r="3" fill="#4d6bfe"/>
-  <text x="44" y="68" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" fill="#1f2328">Opened pull request in Community-Access/accessibility-agents</text>
-  <text x="812" y="68" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">6m ago</text>
+  <text x="44" y="68" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" fill="#1f2328">Closed pull request in Logic769/kana-dojo</text>
+  <text x="812" y="68" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">2m ago</text>
   <circle cx="30" cy="86" r="3" fill="#4d6bfe"/>
-  <text x="44" y="90" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" fill="#1f2328">Forked selimfirat/pysad</text>
-  <text x="812" y="90" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">8m ago</text>
+  <text x="44" y="90" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" fill="#1f2328">Opened pull request in Logic769/kana-dojo</text>
+  <text x="812" y="90" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">2m ago</text>
   <circle cx="30" cy="108" r="3" fill="#4d6bfe"/>
-  <text x="44" y="112" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" fill="#1f2328">Merged pull request in Community-Access/accessibility-agents</text>
+  <text x="44" y="112" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" fill="#1f2328">Opened pull request in Community-Access/accessibility-agents</text>
   <text x="812" y="112" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">9m ago</text>
   <circle cx="30" cy="130" r="3" fill="#4d6bfe"/>
-  <text x="44" y="134" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" fill="#1f2328">Merged pull request in Community-Access/accessibility-agents</text>
-  <text x="812" y="134" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">9m ago</text>
+  <text x="44" y="134" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" fill="#1f2328">Forked selimfirat/pysad</text>
+  <text x="812" y="134" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">11m ago</text>
   <circle cx="30" cy="152" r="3" fill="#4d6bfe"/>
-  <text x="44" y="156" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" fill="#1f2328">Forked microsoft/PyRIT</text>
-  <text x="812" y="156" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">10m ago</text>
+  <text x="44" y="156" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" fill="#1f2328">Merged pull request in Community-Access/accessibility-agents</text>
+  <text x="812" y="156" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">12m ago</text>
 </svg>

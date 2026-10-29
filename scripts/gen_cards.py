@@ -10,6 +10,7 @@ Local run:  GH_TOKEN=$(gh auth token) python scripts/gen_cards.py
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 import sys
@@ -166,6 +167,33 @@ def compute_streaks(daily):
     return current, longest, sum(daily.values())
 
 
+RANK_THRESHOLDS = (1, 12.5, 25, 37.5, 50, 62.5, 75, 87.5, 100)
+RANK_LEVELS = ("S", "A+", "A", "A-", "B+", "B", "B-", "C+", "C")
+
+
+def compute_rank(data):
+    """Percentile rank with the same formula github-readme-stats used publicly."""
+
+    def cdf(value, median):
+        return 1.0 - 2.0 ** (-float(value) / median)
+
+    weighted = (
+        (2, cdf(data.get("commits") or 0, 1000)),
+        (3, cdf(data.get("prs") or 0, 50)),
+        (1, cdf(data.get("issues") or 0, 25)),
+        (4, cdf(data.get("stars") or 0, 50)),
+        (1, cdf(data.get("followers") or 0, 10)),
+    )
+    weight_total = sum(weight for weight, _ in weighted)
+    percentile = (1.0 - sum(w * c for w, c in weighted) / weight_total) * 100.0
+    level = RANK_LEVELS[-1]
+    for threshold, name in zip(RANK_THRESHOLDS, RANK_LEVELS):
+        if percentile <= threshold:
+            level = name
+            break
+    return level, percentile
+
+
 def relative_time(iso):
     try:
         stamp = datetime.fromisoformat(iso.replace("Z", "+00:00"))
@@ -267,19 +295,45 @@ def render_stats(t, data, width=420, height=200):
     for index, (label, value) in enumerate(cells):
         col = index % 2
         row = index // 2
-        lx = 26 if col == 0 else 226
-        vx = 192 if col == 0 else 394
-        y = 84 + row * 42
+        lx = 22 if col == 0 else 168
+        vx = 132 if col == 0 else 278
+        y = 86 + row * 40
         body += (
-            '  <text x="%d" y="%d" font-family=\'%s\' font-size="11" fill="%s">%s</text>\n'
+            '  <text x="%d" y="%d" font-family=\'%s\' font-size="10.5" fill="%s">%s</text>\n'
             % (lx, y, FONT, t["muted"], esc(label))
         )
         body += (
-            '  <text x="%d" y="%d" font-family=\'%s\' font-size="20" font-weight="700" '
+            '  <text x="%d" y="%d" font-family=\'%s\' font-size="18" font-weight="700" '
             'text-anchor="end" fill="%s">%s</text>\n'
-            % (vx, y + 4, FONT, t["text"], esc(value))
+            % (vx, y + 3, FONT, t["text"], esc(value))
         )
+    level, percentile = compute_rank(data)
+    body += rank_ring(t, level, percentile)
     body += "</svg>\n"
+    return body
+
+
+def rank_ring(t, level, percentile, cx=364, cy=110, radius=32, stroke=5):
+    circumference = 2 * math.pi * radius
+    filled = circumference * max(0.0, min(100.0, 100.0 - percentile)) / 100.0
+    body = '  <circle cx="%d" cy="%d" r="%d" fill="none" stroke="%s" stroke-width="%d"/>\n' % (
+        cx, cy, radius, t["track"], stroke
+    )
+    body += (
+        '  <circle cx="%d" cy="%d" r="%d" fill="none" stroke="%s" stroke-width="%d" '
+        'stroke-linecap="round" stroke-dasharray="%.1f %.1f" transform="rotate(-90 %d %d)"/>\n'
+        % (cx, cy, radius, t["accent"], stroke, filled, circumference - filled, cx, cy)
+    )
+    body += (
+        '  <text x="%d" y="%d" font-family=\'%s\' font-size="20" font-weight="700" '
+        'text-anchor="middle" fill="%s">%s</text>\n'
+        % (cx, cy + 7, FONT, t["text"], esc(level))
+    )
+    body += (
+        '  <text x="%d" y="%d" font-family=\'%s\' font-size="9" letter-spacing="1.2" '
+        'text-anchor="middle" fill="%s">RANK</text>\n'
+        % (cx, cy + radius + 15, FONT, t["muted"])
+    )
     return body
 
 
