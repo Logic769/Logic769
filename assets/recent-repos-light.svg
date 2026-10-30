@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="420" height="200" viewBox="0 0 420 200" role="img" aria-label="Recently updated repositories">
   <rect x="0.5" y="0.5" width="419" height="199" rx="10" fill="#ffffff" stroke="#d8dee4"/>
   <text x="26" y="36" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="14" font-weight="700" fill="#4d6bfe">Recently Updated</text>
-  <text x="26" y="74" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" font-weight="600" fill="#1f2328">news-crawler</text>
-  <text x="394" y="74" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">Python  ·  46m ago</text>
-  <text x="26" y="99" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" font-weight="600" fill="#1f2328">Logic769</text>
-  <text x="394" y="99" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">Python  ·  4h ago</text>
+  <text x="26" y="74" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" font-weight="600" fill="#1f2328">Logic769</text>
+  <text x="394" y="74" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">Python  ·  4h ago</text>
+  <text x="26" y="99" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" font-weight="600" fill="#1f2328">news-crawler</text>
+  <text x="394" y="99" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">Python  ·  5h ago</text>
   <text x="26" y="124" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" font-weight="600" fill="#1f2328">Adguardhome-local-rules</text>
-  <text x="394" y="124" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">12h ago</text>
+  <text x="394" y="124" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">16h ago</text>
   <text x="26" y="149" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" font-weight="600" fill="#1f2328">operator-skills</text>
   <text x="394" y="149" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="10.5" text-anchor="end" fill="#6a737d">1d ago</text>
   <text x="26" y="174" font-family='-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif' font-size="11.5" font-weight="600" fill="#1f2328">dns-guard-stack</text>
