@@ -285,8 +285,7 @@ def render(grid, plan, daily, dark=True):
                 frames.append("{0:.3f}% {{ opacity: 0; }}".format(pb))
             else:
                 reach_end = True
-        if not reach_end:
-            frames.append("100% { opacity: 0; }")
+        frames.append("100% { opacity: 1; }" if reach_end else "100% { opacity: 0; }")
         css.append("@keyframes b{c}_{r} {{ {kf} }}\n"
                    ".b{c}_{r} {{ animation: b{c}_{r} {dur:.1f}s linear infinite; }}".format(
                        c=c, r=r, kf=" ".join(frames), dur=dur))
