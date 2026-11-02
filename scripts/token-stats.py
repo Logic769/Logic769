@@ -1039,31 +1039,27 @@ def svg_card(r, dark=True, zh=False, live=None):
         lvl = lambda v: 0
 
     cell, pitch = 10, 13
-    week0 = start_d - datetime.timedelta(days=(start_d.weekday() + 1) % 7)  # 周日开头
-    cols = []
-    ws = week0
-    while ws <= today_d:
-        cols.append(ws)
-        ws += datetime.timedelta(days=7)
-    MAX_COLS = (CW - 72) // pitch  # 列上限：预留右侧 "TODAY 今日计数" 的 72px，防计数器越出卡体
-    if len(cols) > MAX_COLS:       # 全历史越限时滚动保留最近窗口（13px/列 ≈ 2027 年触顶）
-        cols = cols[-MAX_COLS:]
+    # 与 GitHub 贡献热力图同构：固定 53 列 = 一整年，最后一列是本周；
+    # 数据区间外的日子按 0 级补齐，整年宽度恒定、不随数据跨度抖动。
+    NCOLS = 53
+    week0 = today_d - datetime.timedelta(days=(today_d.weekday() + 1) % 7)  # 本周的周日
+    grid_start = week0 - datetime.timedelta(days=(NCOLS - 1) * 7)
+    cols = [grid_start + datetime.timedelta(days=7 * i) for i in range(NCOLS)]
     ncol = len(cols)
     hm_w = ncol * pitch
     grid_x = X0 + (CW - hm_w) // 2
     hm_y = 170 + YS
 
     # 月份标签（列对应周一→该月起始列）
-    prev_m = None
+    prev_m, prev_i = None, -9
     for i, ws in enumerate(cols):
         m = ws.month
-        label_it = (i == 0 and m != prev_m) or (i > 0 and m != prev_m)
-        if label_it and i > 0 and ws < start_d:
-            label_it = False
-        if label_it:
+        # 整年跨度会有 12+ 个月份切换，标签需与前一个至少隔 2 列，避免 13px 列距下挤成一团
+        if m != prev_m and i - prev_i >= 2:
             x = grid_x + i * pitch
             if x < X1 - 26:
                 lines.append(f'<text x="{x}" y="{162 + YS}" font-size="9.5" font-weight="500" class="faint" text-anchor="start">{mon_label(m)}</text>')
+            prev_i = i
         prev_m = m
     for row, lb in L["wd"].items():
         lines.append(f'<text x="{grid_x - 8}" y="{hm_y + row * pitch + 8}" font-size="9" font-weight="500" class="faint" text-anchor="end">{lb}</text>')
@@ -1077,7 +1073,7 @@ def svg_card(r, dark=True, zh=False, live=None):
     for i, ws in enumerate(cols):
         for row in range(7):
             dd = ws + datetime.timedelta(days=row)
-            if start_d <= dd <= today_d:
+            if grid_start <= dd <= today_d:   # 整年窗口：无数据的日子按 0 级补齐
                 grid_cells[(i, row)] = (grid_x + i * pitch, hm_y + row * pitch,
                                         lvl(daily.get(dd, 0)), daily.get(dd, 0))
     plan = plan_snake_route({cr: g[2] for cr, g in grid_cells.items()})
