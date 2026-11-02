@@ -9,9 +9,9 @@
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/activity-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="assets/activity-light.svg" /><img width="840" src="assets/activity-dark.svg" alt="recent activity" /></picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Logic769/Logic769/output/github-snake-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Logic769/Logic769/output/github-snake.svg" />
-  <img width="100%" src="https://raw.githubusercontent.com/Logic769/Logic769/output/github-snake.svg" alt="contribution snake" />
+  <source media="(prefers-color-scheme: dark)" srcset="assets/token-stats-zh-dark.svg?v=1793631617" />
+  <source media="(prefers-color-scheme: light)" srcset="assets/token-stats-zh-light.svg?v=1793631617" />
+  <img width="100%" src="assets/token-stats-zh-dark.svg?v=1793631617" alt="AI token usage" />
 </picture>
 
 <img src="https://komarev.com/ghpvc/?username=Logic769&style=flat-square" alt="profile views" />
