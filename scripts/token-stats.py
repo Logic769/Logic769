@@ -1350,14 +1350,13 @@ def daily_task_running():
     if os.name != "nt":
         return False
     try:
+        # 只看退出码，不解码输出：schtasks 的文本随系统语言本地化，
+        # 且在计划任务上下文里 stdout 编码可能不同，按文本匹配会误判为未注册。
         out = subprocess.run(["schtasks", "/query", "/tn", TASK_NAME],
-                             capture_output=True, text=True, timeout=15)
+                             capture_output=True, timeout=15)
     except Exception:
         return False
-    if out.returncode != 0:
-        return False
-    text = (out.stdout or "").lower()
-    return any(s in text for s in ("ready", "running", "就绪", "正在运行"))
+    return out.returncode == 0
 
 
 def _unpushed_commits():
