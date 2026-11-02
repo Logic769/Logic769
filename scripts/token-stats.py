@@ -632,11 +632,11 @@ def trend_section(r, PAL, L, x0, x1, yo=0):
     span_days = max((today - start).days, 1)
 
     days_sorted = sorted(daily)
-    # 7日滚动均值：活跃日窗口（当前活跃日 + 前6个活跃日）
+    # 7日滚动均值：按日历日窗口（当前日 + 前6个日历日），无记录的日子按 0 计入分母，
+    # 否则断档窗口里"最近 7 个有记录日"的均值会系统性偏高。
     roll = {}
-    for i, d in enumerate(days_sorted):
-        win = days_sorted[max(0, i - 6): i + 1]
-        roll[d] = sum(daily[x] for x in win) / len(win)
+    for d in days_sorted:
+        roll[d] = sum(daily.get(d - datetime.timedelta(days=k), 0) for k in range(7)) / 7.0
 
     vmax = _nice_max(max(daily.values()) if daily else 0)
     plot_top, plot_bot = 528 + yo, 628 + yo
@@ -900,7 +900,8 @@ def svg_card(r, dark=True, zh=False, live=None):
     denom = inp + out + cached + cc
     cpct = cached / denom * 100 if denom else 0.0   # 无分量数据显 0%，不伪造 "cached 95%"
     conv_k = r.get("conversations", 0) / 1000
-    _up = sum((v or {}).get("tokens", 0) for v in (r.get("unpriced") or {}).values())
+    _up = sum((v or {}).get("tokens", 0) for v in (r.get("unpriced") or {}).values()
+              if (v or {}).get("status") == "unpriced")   # 免费额度不算"未定价"
     up_pct = _up / r["total_tokens"] * 100 if r.get("total_tokens") else 0.0
     start = r.get("period_start") or "2026-03"
     try:
@@ -1377,11 +1378,11 @@ def _bump_readme_cache_bust(version):
     """
     try:
         with open(README_PATH, encoding="utf-8") as f:
-            text = f.read()
+            original = f.read()
     except OSError:
         print("   ⚠️ README 读取失败，跳过 cache-bust")
-        return
-    text = re.sub(README_STAMP_RE, lambda m: m.group(1) + "?v=" + str(version), text)
+        return None
+    text = re.sub(README_STAMP_RE, lambda m: m.group(1) + "?v=" + str(version), original)
     tmp = f"{README_PATH}.{os.getpid()}.tmp"
     try:
         with open(tmp, "w", encoding="utf-8", newline="\n") as f:
@@ -1393,8 +1394,9 @@ def _bump_readme_cache_bust(version):
             os.unlink(tmp)
         except OSError:
             pass
-        return
+        return None
     print(f"   README 缓存参数已更新 v={version}")
+    return original
 
 
 def _heal_divergence():
@@ -1406,6 +1408,13 @@ def _heal_divergence():
     git_dir = os.path.join(REPO_DIR, ".git")
     if any(os.path.exists(os.path.join(git_dir, s)) for s in ("rebase-merge", "rebase-apply")):
         return   # 已有 rebase 在进行（可能是人工操作）：不插手
+    # 工作区/暂存区不干净时绝不做 --autostash rebase：pop 冲突会把用户改动留在 stash 里、
+    # 工作区却不再包含它们，而 rebase-merge 目录已消失 → 调用方误判"自愈成功"。
+    dirty = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True,
+                           timeout=15, cwd=REPO_DIR)
+    if dirty.returncode != 0 or dirty.stdout.strip():
+        print("   ⚠️ 工作区有未提交改动，跳过 rebase 自愈（避免吞掉本地改动）", flush=True)
+        return
     try:
         subprocess.run(["git", "fetch", "origin"], capture_output=True, timeout=30, cwd=REPO_DIR)
         subprocess.run(["git", "rebase", "--autostash", "-X", "ours", "@{upstream}"],
@@ -1439,21 +1448,31 @@ def git_sync():
         # README 若已有别人的未提交改动（如手工编辑），绝不代提交：本轮只提交 SVG，
         # 放弃 ?v= 缓存击穿（宁可可能读到旧缓存，也不把用户改动夹带进自动提交）。
         paths = GIT_PATHS
+        readme_original = None
         if readme_dirty:
             print("   ⚠️ README 有未提交改动，本轮不代提交 README（跳过缓存击穿）")
             paths = svg_paths
         else:
-            _bump_readme_cache_bust(int(time.time()))
+            readme_original = _bump_readme_cache_bust(int(time.time()))
         subprocess.run(["git", "add"] + paths, check=True, cwd=REPO_DIR)
         try:
             subprocess.run(["git", "commit", "-m", "chore: refresh token stats", "--"] + paths,
                            check=True, cwd=REPO_DIR)
         except subprocess.CalledProcessError:
             subprocess.run(["git", "reset", "-q", "HEAD", "--"] + paths, check=False, cwd=REPO_DIR)
+            # README 的 ?v= 已落盘但提交失败：恢复原文，否则 README 永久脏 → 之后每轮
+            # readme_dirty 为真、缓存击穿永久失效且无提示。
+            if readme_original is not None:
+                try:
+                    with open(README_PATH, "w", encoding="utf-8", newline="\n") as fh:
+                        fh.write(readme_original)
+                    print("   ↩️ 已回滚 README 的 ?v= 改动")
+                except OSError as e:
+                    print(f"   ⚠️ README 回滚失败（{e}）")
             raise
         print("   已提交，推送中…")
     if _unpushed_commits() <= 0:
-        return
+        return True
     for attempt in range(1, 4):
         try:
             r = subprocess.run(["git", "push", "origin", "HEAD"], timeout=90, cwd=REPO_DIR)
@@ -1462,12 +1481,13 @@ def git_sync():
             print("   推送超时（90s）", flush=True)
         if r is not None and r.returncode == 0:
             print("   推送成功")
-            return
+            return True
         _heal_divergence()
         if attempt < 3:
             print(f"   推送失败（第 {attempt} 次），30s 后重试…", flush=True)
             time.sleep(30)
-    print("   推送失败（已重试 3 次，下轮周期自动重试）")
+    print("   推送失败（已重试 3 次，下轮周期自动重试）", flush=True)
+    return False
 
 
 def verify_row_costs(path):
@@ -1505,6 +1525,9 @@ def verify_row_costs(path):
                 if bad <= 10:
                     print(f"DIFF {key} got={got!r} want={want!r}")
     print(f"verify: checked={checked} mismatches={bad}")
+    if checked == 0:
+        print("verify: 基准文件为空或全部缺失，视为失败", file=sys.stderr)
+        return 1
     return bad
 
 
@@ -1530,6 +1553,13 @@ def main():
     if _zero_data(r):
         print("⚠️  聚合结果为零，疑似数据源异常，拒绝写盘/推送")
         return 1
+    curated, litellm = load_pricing_tables()
+    if not (curated.get("exact") or litellm):
+        print("⚠️  定价表全部不可用（快照与 LiteLLM 缓存都读不到），拒绝写盘/推送", file=sys.stderr)
+        return 1
+    if r["total_tokens"] > 0 and r["total_cost"] <= 0:
+        print("⚠️  有 token 但成本恒为 0，定价链路疑似失效，拒绝写盘/推送", file=sys.stderr)
+        return 1
 
     lock_fd = _refresh_lock()
     if lock_fd is None:
@@ -1553,7 +1583,11 @@ def main():
 
         if not args.no_sync:
             try:
-                git_sync()
+                if not git_sync():
+                    # 推送失败必须让计划任务拿到非零退出码，否则 LastTaskResult=0 会掩盖
+                    # "卡片生成了但从未发布"这种静默失败。
+                    print("⚠️  同步未完成：推送失败，退出码 1（下轮自动重试）", flush=True)
+                    return 1
             except Exception as e:
                 print(f"⚠️  同步失败（{e}）", flush=True)
                 return 1
