@@ -27,7 +27,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_LOGIN: Logic769
-        run: python3 scripts/gen_cards.py
+        run: |
+          python3 scripts/gen_cards.py
+          python3 scripts/gen_snake_card.py
 
       - name: Commit refreshed cards
         run: |
