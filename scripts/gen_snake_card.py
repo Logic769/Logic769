@@ -308,7 +308,7 @@ def render(grid, plan, daily, dark=True):
     for lev in grid.values():
         if lev:
             per_level[lev - 1] += 1
-    food_total = sum(per_level) or 1
+    food_total = sum(per_level)
     eats_by_level = {1: [], 2: [], 3: [], 4: []}
     for s, cr in eats:
         eats_by_level[grid[cr]].append(s)
@@ -319,13 +319,13 @@ def render(grid, plan, daily, dark=True):
         cnt = per_level[lev - 1]
         if not cnt:
             continue
-        w = BAR_W * cnt / food_total
+        w = BAR_W * cnt / max(food_total, 1)
         steps = sorted(eats_by_level[lev])
         frames = ["0% { transform: scale(0, 1); }"]
         for k, s in enumerate(steps):
             frames.append("{0:.3f}% {{ transform: scale({1:.4f}, 1); }}".format(
-                _pct(s, total), (k + 1) / len(steps)))
-        frames.append("100% { transform: scale(1, 1); }")
+                _pct(s, total), (k + 1) / cnt))
+        frames.append("100% {{ transform: scale({0:.4f}, 1); }}".format(min(len(steps) / cnt, 1.0)))
         css.append("@keyframes u{0} {{ {1} }}\n"
                    ".u{0} {{ transform-box: fill-box; transform-origin: left center; "
                    "animation: u{0} {2:.1f}s linear infinite; }}".format(lev, " ".join(frames), dur))
@@ -409,7 +409,7 @@ def main(argv=None):
         print(json.dumps(stats, ensure_ascii=False, indent=2))
         return 0
 
-    if changed and not no_stamp and README_PATH.exists():
+    if changed and not no_stamp and out_dir == OUT_DIR and README_PATH.exists():
         text = README_PATH.read_text(encoding="utf-8")
         new = _bump_readme_stamp(text, int(time.time()))
         if new != text:
