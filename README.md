@@ -9,9 +9,9 @@
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/activity-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="assets/activity-light.svg" /><img width="840" src="assets/activity-dark.svg" alt="recent activity" /></picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/token-stats-zh-dark.svg?v=1793634904" />
-  <source media="(prefers-color-scheme: light)" srcset="assets/token-stats-zh-light.svg?v=1793634904" />
-  <img width="100%" src="assets/token-stats-zh-dark.svg?v=1793634904" alt="AI token usage" />
+  <source media="(prefers-color-scheme: dark)" srcset="assets/token-stats-zh-dark.svg?v=1793635599" />
+  <source media="(prefers-color-scheme: light)" srcset="assets/token-stats-zh-light.svg?v=1793635599" />
+  <img width="100%" src="assets/token-stats-zh-dark.svg?v=1793635599" alt="AI token usage" />
 </picture>
 
 <img src="https://komarev.com/ghpvc/?username=Logic769&style=flat-square" alt="profile views" />
