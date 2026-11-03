@@ -249,13 +249,11 @@ def render(grid, plan, daily, dark=True):
     eps = 0.05
 
     intervals, open_iv = {}, {}
-    body_len = []
     body, prev = deque(), set()
     for s in range(n):
         body.append(route[s])
         if pops[s]:
             body.popleft()
-        body_len.append(len(body))
         cur = set(body)
         for cr in cur - prev:
             open_iv[cr] = s
@@ -275,17 +273,8 @@ def render(grid, plan, daily, dark=True):
             "{0:02x}".format(round(int(c[i:i + 2], 16) * (1 - k) + int(bg_hex[i:i + 2], 16) * k))
             for i in (1, 3, 5))
 
-    # Acfufu/token-stats.py 的 RAMP 颜色序列；原版固定按 1/5/13/26 步入队年龄
-    # 转暗，适合短蛇。整年网格里身长可达 73 节，固定阈值会让后半段全暗，
-    # 因此按实际身长归一化到 6%/60%/85%/96%/99%，保留头亮尾暗的阶梯。
-    lmax = max(body_len) if body_len else 1
-    RAMP = (
-        (max(1, int(round(lmax * 0.06))), snk_flash),
-        (max(2, int(round(lmax * 0.60))), snk_flash),
-        (max(3, int(round(lmax * 0.85))), snk_body),
-        (max(4, int(round(lmax * 0.96))), snk_old1),
-        (max(5, int(round(lmax * 0.99))), snk_old2),
-    )
+    # Acfufu/token-stats.py 原版蛇身色阶（逐字移植）。
+    RAMP = ((1, snk_flash), (5, snk_body), (13, snk_old1), (26, snk_old2))
     ramp_ghost = tuple((age, _ghost(col)) for age, col in RAMP)
 
     swaps = []
@@ -302,17 +291,10 @@ def render(grid, plan, daily, dark=True):
             runs[-1][1] = s
         else:
             runs.append([s, s])
-    # Acfufu 原版会把整段连续踩尾窗口都幽灵化；整年网格的尾追段可能很长，
-    # 会把整条蛇压暗。只保留短脱困窗口，长尾追段仍按正常 RAMP 上色。
-    windows = [(max(0, a - 4), min(n, b + 4)) for a, b in runs if b - a <= 10]
+    windows = [(max(0, a - 4), min(n, b + 4)) for a, b in runs]
 
     def _in_escape(a, b):
         return any(a < wb and b > wa for wa, wb in windows)
-
-    def _add_ramp(stops, born, end, ramp):
-        for age, col in ramp:
-            if born + age < min(end, n):
-                stops.append((_pct(born + age, total), col))
 
     css = ["@media (prefers-reduced-motion: reduce) { * { animation: none !important; } "
            ".u1, .u2, .u3, .u4 { transform: scale(1, 1) !important; } }"]
@@ -327,25 +309,26 @@ def render(grid, plan, daily, dark=True):
         for a, b in ivs:
             post = pal["track"] if eaten_at.get((c, r), n) <= b else base
             pa = _pct(a, total)
-            if pa > 0:
-                stops.append((max(pa - eps, 0.0), None))
+            stops.append((max(pa - 0.05, 0.0), None))
             stops.append((pa, snk_head))
             ramp = ramp_ghost if _in_escape(a, b) else RAMP
-            _add_ramp(stops, a, b, ramp)
+            for age, col in ramp:
+                if a + age < b:
+                    stops.append((_pct(a + age, total), col))
             for s in [x for x in swap_hits if a <= x < b]:
                 ps = _pct(s, total)
-                if ps > 0:
-                    stops.append((max(ps - eps, 0.0), None))
+                stops.append((max(ps - 0.05, 0.0), None))
                 stops.append((ps, snk_head))
                 ramp2 = ramp_ghost if _in_escape(s, s + 1) else RAMP
-                _add_ramp(stops, s, b, ramp2)
+                for age, col in ramp2:
+                    if s + age < b:
+                        stops.append((_pct(s + age, total), col))
             if b < total:
                 pb = _pct(b, total)
-                stops.append((max(pb - eps, 0.0), None))
+                stops.append((max(pb - 0.05, 0.0), None))
                 stops.append((pb, post))
-        ordered = sorted(stops, key=lambda x: (x[0], 0 if x[1] is None else 1))
         frames, last = [], base
-        for p, col in ordered:
+        for p, col in stops:
             if col is None:
                 frames.append("{0:.3f}% {{ fill: {1}; }}".format(p, last))
             else:
@@ -359,7 +342,6 @@ def render(grid, plan, daily, dark=True):
                 pts.append((max(_pct(s, total) - 0.10, 0.0), "transparent"))
                 pts.append((_pct(s, total), "{0}; stroke-width: 2".format(pal["acc"])))
                 pts.append((min(_pct(s, total) + 0.12, 99.99), "transparent"))
-            pts.append((100.0, "transparent"))
             kf = " ".join("{0:.3f}% {{ stroke: {1}; }}".format(p, c2) for p, c2 in pts)
             css.append("@keyframes s{0} {{ {1} }}".format(cls, kf))
             anim += ", s{0} {1:.1f}s linear infinite".format(cls, dur)
@@ -437,7 +419,7 @@ def main(argv=None):
         return 1
     start, grid = build_grid(daily)
     food = sum(1 for v in grid.values() if v > 0)
-    caps = tuple([BASE_LEN + max(food, 1)] + [40, 36, 32, 28, 24, 20, 16, 12])
+    caps = (40, 36, 32, 28, 24, 20, 16, 12)
     plan = plan_snake_route({cr: lev for cr, lev in grid.items()}, base_len=BASE_LEN, caps=caps)
     if plan is None:
         print("warn: no contribution cells to eat, rendering static grid", file=sys.stderr)
