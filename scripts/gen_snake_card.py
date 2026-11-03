@@ -50,8 +50,8 @@ PALETTES = {
     "light": {
         "empty": "#ebedf0",
         "levels": ("#9be9a8", "#40c463", "#30a14e", "#216e39"),
-        "snake": ("#2563eb", "#1d4ed8", "#1e40af"),
-        "snake_tail": ("#1e3a8a", "#172554"),
+        "snake": ("#a5b4fc", "#7c93ff", "#4d6bfe"),
+        "snake_tail": ("#3b5bf5", "#2a45d8"),
         "acc": "#b45309",
         "bg": "#ffffff",
         "ghost_k": 0.20,
@@ -249,11 +249,13 @@ def render(grid, plan, daily, dark=True):
     eps = 0.05
 
     intervals, open_iv = {}, {}
+    body_len = []
     body, prev = deque(), set()
     for s in range(n):
         body.append(route[s])
         if pops[s]:
             body.popleft()
+        body_len.append(len(body))
         cur = set(body)
         for cr in cur - prev:
             open_iv[cr] = s
@@ -266,7 +268,6 @@ def render(grid, plan, daily, dark=True):
     eaten_at = {cr: s for s, cr in eats}
     snk_head, snk_flash, snk_body = pal["snake"]
     snk_old1, snk_old2 = pal["snake_tail"]
-    RAMP = ((1, snk_flash), (5, snk_body), (13, snk_old1), (26, snk_old2))
     bg_hex = pal["bg"]
 
     def _ghost(c, k=0.45):
@@ -275,7 +276,21 @@ def render(grid, plan, daily, dark=True):
             for i in (1, 3, 5))
 
     ghost_k = pal.get("ghost_k", 0.45)
-    ramp_ghost = tuple((age, _ghost(col, ghost_k)) for age, col in RAMP)
+
+    lmax = max(body_len) if body_len else 1
+
+    def _ramp_color(age, ghost=False):
+        frac = age / float(max(lmax - 1, 1))
+        if frac < 0.08:
+            col = snk_flash
+        elif frac < 0.38:
+            col = snk_body
+        elif frac < 0.75:
+            col = snk_old1
+        else:
+            col = snk_old2
+        return _ghost(col, ghost_k) if ghost else col
+
     swaps = []
     body_sim = deque()
     for s in range(n):
@@ -290,10 +305,18 @@ def render(grid, plan, daily, dark=True):
             runs[-1][1] = s
         else:
             runs.append([s, s])
-    windows = [(max(0, a - 4), min(n, b + 4)) for a, b in runs]
+    windows = [(max(0, a - 4), min(n, b + 4)) for a, b in runs if b - a <= 10]
 
     def _in_escape(a, b):
         return any(a < wb and b > wa for wa, wb in windows)
+
+    def _add_ramp(stops, born, end):
+        last_col = None
+        for s in range(born + 1, min(end, n)):
+            col = _ramp_color(s - born, _in_escape(s, s + 1))
+            if col != last_col:
+                stops.append((_pct(s, total), col))
+                last_col = col
 
     css = ["@media (prefers-reduced-motion: reduce) { * { animation: none !important; } "
            ".u1, .u2, .u3, .u4 { transform: scale(1, 1) !important; } }"]
@@ -311,19 +334,13 @@ def render(grid, plan, daily, dark=True):
             if pa > 0:
                 stops.append((max(pa - eps, 0.0), None))
             stops.append((pa, snk_head))
-            ramp = ramp_ghost if _in_escape(a, b) else RAMP
-            for age, col in ramp:
-                if a + age < b:
-                    stops.append((_pct(a + age, total), col))
+            _add_ramp(stops, a, b)
             for s in [x for x in swap_hits if a <= x < b]:
                 ps = _pct(s, total)
                 if ps > 0:
                     stops.append((max(ps - eps, 0.0), None))
                 stops.append((ps, snk_head))
-                ramp2 = ramp_ghost if _in_escape(s, s + 1) else RAMP
-                for age, col in ramp2:
-                    if s + age < b:
-                        stops.append((_pct(s + age, total), col))
+                _add_ramp(stops, s, b)
             if b < total:
                 pb = _pct(b, total)
                 stops.append((max(pb - eps, 0.0), None))
