@@ -275,24 +275,18 @@ def render(grid, plan, daily, dark=True):
             "{0:02x}".format(round(int(c[i:i + 2], 16) * (1 - k) + int(bg_hex[i:i + 2], 16) * k))
             for i in (1, 3, 5))
 
-    ghost_k = pal.get("ghost_k", 0.45)
-
+    # Acfufu/token-stats.py 的 RAMP 颜色序列；原版固定按 1/5/13/26 步入队年龄
+    # 转暗，适合短蛇。整年网格里身长可达 73 节，固定阈值会让后半段全暗，
+    # 因此按实际身长归一化到 6%/60%/85%/96%/99%，保留头亮尾暗的阶梯。
     lmax = max(body_len) if body_len else 1
-
-    def _ramp_color(age, ghost=False):
-        # Keep most of the body in the bright cyan range; only the last
-        # quarter fades through the two darker blues.  The earlier 8/38/75
-        # split made a 70+ segment snake look almost uniformly dark.
-        frac = age / float(max(lmax - 1, 1))
-        if frac < 0.62:
-            col = snk_flash
-        elif frac < 0.85:
-            col = snk_body
-        elif frac < 0.95:
-            col = snk_old1
-        else:
-            col = snk_old2
-        return _ghost(col, ghost_k) if ghost else col
+    RAMP = (
+        (max(1, int(round(lmax * 0.06))), snk_flash),
+        (max(2, int(round(lmax * 0.60))), snk_flash),
+        (max(3, int(round(lmax * 0.85))), snk_body),
+        (max(4, int(round(lmax * 0.96))), snk_old1),
+        (max(5, int(round(lmax * 0.99))), snk_old2),
+    )
+    ramp_ghost = tuple((age, _ghost(col)) for age, col in RAMP)
 
     swaps = []
     body_sim = deque()
@@ -308,18 +302,17 @@ def render(grid, plan, daily, dark=True):
             runs[-1][1] = s
         else:
             runs.append([s, s])
+    # Acfufu 原版会把整段连续踩尾窗口都幽灵化；整年网格的尾追段可能很长，
+    # 会把整条蛇压暗。只保留短脱困窗口，长尾追段仍按正常 RAMP 上色。
     windows = [(max(0, a - 4), min(n, b + 4)) for a, b in runs if b - a <= 10]
 
     def _in_escape(a, b):
         return any(a < wb and b > wa for wa, wb in windows)
 
-    def _add_ramp(stops, born, end):
-        last_col = None
-        for s in range(born + 1, min(end, n)):
-            col = _ramp_color(s - born, _in_escape(s, s + 1))
-            if col != last_col:
-                stops.append((_pct(s, total), col))
-                last_col = col
+    def _add_ramp(stops, born, end, ramp):
+        for age, col in ramp:
+            if born + age < min(end, n):
+                stops.append((_pct(born + age, total), col))
 
     css = ["@media (prefers-reduced-motion: reduce) { * { animation: none !important; } "
            ".u1, .u2, .u3, .u4 { transform: scale(1, 1) !important; } }"]
@@ -337,13 +330,15 @@ def render(grid, plan, daily, dark=True):
             if pa > 0:
                 stops.append((max(pa - eps, 0.0), None))
             stops.append((pa, snk_head))
-            _add_ramp(stops, a, b)
+            ramp = ramp_ghost if _in_escape(a, b) else RAMP
+            _add_ramp(stops, a, b, ramp)
             for s in [x for x in swap_hits if a <= x < b]:
                 ps = _pct(s, total)
                 if ps > 0:
                     stops.append((max(ps - eps, 0.0), None))
                 stops.append((ps, snk_head))
-                _add_ramp(stops, s, b)
+                ramp2 = ramp_ghost if _in_escape(s, s + 1) else RAMP
+                _add_ramp(stops, s, b, ramp2)
             if b < total:
                 pb = _pct(b, total)
                 stops.append((max(pb - eps, 0.0), None))
