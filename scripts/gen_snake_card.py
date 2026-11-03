@@ -280,12 +280,15 @@ def render(grid, plan, daily, dark=True):
     lmax = max(body_len) if body_len else 1
 
     def _ramp_color(age, ghost=False):
+        # Keep most of the body in the bright cyan range; only the last
+        # quarter fades through the two darker blues.  The earlier 8/38/75
+        # split made a 70+ segment snake look almost uniformly dark.
         frac = age / float(max(lmax - 1, 1))
-        if frac < 0.08:
+        if frac < 0.62:
             col = snk_flash
-        elif frac < 0.38:
+        elif frac < 0.85:
             col = snk_body
-        elif frac < 0.75:
+        elif frac < 0.95:
             col = snk_old1
         else:
             col = snk_old2
