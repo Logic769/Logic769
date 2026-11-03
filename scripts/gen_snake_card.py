@@ -40,15 +40,21 @@ PALETTES = {
     "dark": {
         "empty": "#161b22",
         "levels": ("#0e4429", "#006d32", "#26a641", "#39d353"),
-        "snake": "#7aa2f7",
-        "head": "#cfe4ff",
+        "snake": ("#c9e4ff", "#79c0ff", "#58a6ff"),
+        "snake_tail": ("#4485d4", "#3a6cb0"),
+        "acc": "#f59e0b",
+        "bg": "#0d1117",
+        "ghost_k": 0.45,
         "track": "#161b22",
     },
     "light": {
         "empty": "#ebedf0",
         "levels": ("#9be9a8", "#40c463", "#30a14e", "#216e39"),
-        "snake": "#4d6bfe",
-        "head": "#9dbcff",
+        "snake": ("#54aeff", "#0a5cc2", "#0969da"),
+        "snake_tail": ("#2f6fd0", "#1a4f96"),
+        "acc": "#b45309",
+        "bg": "#ffffff",
+        "ghost_k": 0.28,
         "track": "#ebedf0",
     },
 }
@@ -258,51 +264,88 @@ def render(grid, plan, daily, dark=True):
         intervals.setdefault(cr, []).append((s0, total))
 
     eaten_at = {cr: s for s, cr in eats}
+    snk_head, snk_flash, snk_body = pal["snake"]
+    snk_old1, snk_old2 = pal["snake_tail"]
+    RAMP = ((1, snk_flash), (5, snk_body), (13, snk_old1), (26, snk_old2))
+    bg_hex = pal["bg"]
+
+    def _ghost(c, k=0.45):
+        return "#" + "".join(
+            "{0:02x}".format(round(int(c[i:i + 2], 16) * (1 - k) + int(bg_hex[i:i + 2], 16) * k))
+            for i in (1, 3, 5))
+
+    ghost_k = pal.get("ghost_k", 0.45)
+    ramp_ghost = tuple((age, _ghost(col, ghost_k)) for age, col in RAMP)
+    swaps = []
+    body_sim = deque()
+    for s in range(n):
+        if body_sim and route[s] == body_sim[0]:
+            swaps.append(s)
+        body_sim.append(route[s])
+        if pops[s]:
+            body_sim.popleft()
+    runs = []
+    for s in swaps:
+        if runs and s - runs[-1][1] <= 3:
+            runs[-1][1] = s
+        else:
+            runs.append([s, s])
+    windows = [(max(0, a - 4), min(n, b + 4)) for a, b in runs]
+
+    def _in_escape(a, b):
+        return any(a < wb and b > wa for wa, wb in windows)
 
     css = ["@media (prefers-reduced-motion: reduce) { * { animation: none !important; } "
-           ".hd { display: none; } .u1, .u2, .u3, .u4 { transform: scale(1, 1) !important; } }"]
+           ".u1, .u2, .u3, .u4 { transform: scale(1, 1) !important; } }"]
 
-    for (c, r), s in sorted(eaten_at.items()):
-        lev = grid[(c, r)]
-        a = _pct(s, total)
-        col = pal["levels"][lev - 1]
-        kf = ("0% {{ fill: {0}; }} {1:.3f}% {{ fill: {0}; }} {2:.3f}% {{ fill: {3}; }} "
-              "100% {{ fill: {3}; }}").format(col, a, min(a + eps, 99.99), pal["empty"])
-        css.append("@keyframes e{c}_{r} {{ {kf} }}\n"
-                   ".e{c}_{r} {{ animation: e{c}_{r} {dur:.1f}s linear infinite; }}".format(
-                       c=c, r=r, kf=kf, dur=dur))
-
+    # 蛇身按“格子被占用”上色：进格闪头色，随后按入队年龄转暗（头亮尾暗）。
     for (c, r), ivs in sorted(intervals.items()):
-        frames = ["0% { opacity: 0; }"]
-        reach_end = False
+        lev = grid[(c, r)]
+        base = pal["levels"][lev - 1] if lev else pal["empty"]
+        cls = "m{0}_{1}".format(c, r)
+        stops = [(0.0, base)]
+        swap_hits = [s for s in swaps if route[s] == (c, r)]
         for a, b in ivs:
+            post = pal["track"] if eaten_at.get((c, r), n) <= b else base
             pa = _pct(a, total)
-            frames.append("{0:.3f}% {{ opacity: 0; }}".format(max(pa - eps, 0.0)))
-            frames.append("{0:.3f}% {{ opacity: 1; }}".format(pa))
+            stops.append((max(pa - eps, 0.0), None))
+            stops.append((pa, snk_head))
+            ramp = ramp_ghost if _in_escape(a, b) else RAMP
+            for age, col in ramp:
+                if a + age < b:
+                    stops.append((_pct(a + age, total), col))
+            for s in [x for x in swap_hits if a <= x < b]:
+                ps = _pct(s, total)
+                stops.append((max(ps - eps, 0.0), None))
+                stops.append((ps, snk_head))
+                ramp2 = ramp_ghost if _in_escape(s, s + 1) else RAMP
+                for age, col in ramp2:
+                    if s + age < b:
+                        stops.append((_pct(s + age, total), col))
             if b < total:
                 pb = _pct(b, total)
-                frames.append("{0:.3f}% {{ opacity: 1; }}".format(max(pb - eps, 0.0)))
-                frames.append("{0:.3f}% {{ opacity: 0; }}".format(pb))
+                stops.append((max(pb - eps, 0.0), None))
+                stops.append((pb, post))
+        frames, last = [], base
+        for p, col in stops:
+            if col is None:
+                frames.append("{0:.3f}% {{ fill: {1}; }}".format(p, last))
             else:
-                reach_end = True
-        frames.append("100% { opacity: 1; }" if reach_end else "100% { opacity: 0; }")
-        css.append("@keyframes b{c}_{r} {{ {kf} }}\n"
-                   ".b{c}_{r} {{ animation: b{c}_{r} {dur:.1f}s linear infinite; }}".format(
-                       c=c, r=r, kf=" ".join(frames), dur=dur))
-
-    head_el = ""
-    if n:
-        moves = []
-        for s, (c, r) in enumerate(route):
-            moves.append("{0:.3f}% {{ transform: translate({1:.1f}px, {2:.1f}px); }}".format(
-                _pct(s, total), X0 + c * PITCH - 1.2, Y0 + r * PITCH - 1.2))
-        cx, cy = route[-1]
-        moves.append("100% {{ transform: translate({0:.1f}px, {1:.1f}px); }}".format(
-            X0 + cx * PITCH - 1.2, Y0 + cy * PITCH - 1.2))
-        css.append(("@keyframes hd {{ {0} }}\n"
-                    ".hd {{ animation: hd {1:.1f}s linear infinite; }}").format(" ".join(moves), dur))
-        head_el = ('<rect class="hd" x="0" y="0" width="14.4" height="14.4" rx="4.5" '
-                   'fill="{0}" opacity="1"/>').format(pal["head"])
+                frames.append("{0:.3f}% {{ fill: {1}; }}".format(p, col))
+                last = col
+        frames.append("100% {{ fill: {0}; }}".format(last))
+        anim = "k{0} {1:.1f}s linear infinite".format(cls, dur)
+        if swap_hits:
+            pts = [(0.0, "transparent")]
+            for s in swap_hits:
+                pts.append((max(_pct(s, total) - 0.10, 0.0), "transparent"))
+                pts.append((_pct(s, total), "{0}; stroke-width: 2".format(pal["acc"])))
+                pts.append((min(_pct(s, total) + 0.12, 99.99), "transparent"))
+            kf = " ".join("{0:.3f}% {{ stroke: {1}; }}".format(p, c2) for p, c2 in pts)
+            css.append("@keyframes s{0} {{ {1} }}".format(cls, kf))
+            anim += ", s{0} {1:.1f}s linear infinite".format(cls, dur)
+        css.append("@keyframes k{0} {{ {1} }}\n.{0} {{ animation: {2}; }}".format(
+            cls, " ".join(frames), anim))
 
     per_level = [0, 0, 0, 0]
     for lev in grid.values():
@@ -323,6 +366,8 @@ def render(grid, plan, daily, dark=True):
         steps = sorted(eats_by_level[lev])
         frames = ["0% { transform: scale(0, 1); }"]
         for k, s in enumerate(steps):
+            if s == 0:
+                continue
             frames.append("{0:.3f}% {{ transform: scale({1:.4f}, 1); }}".format(
                 _pct(s, total), (k + 1) / cnt))
         frames.append("100% {{ transform: scale({0:.4f}, 1); }}".format(min(len(steps) / cnt, 1.0)))
@@ -344,17 +389,10 @@ def render(grid, plan, daily, dark=True):
         lev = grid[(c, r)]
         x, y = X0 + c * PITCH, Y0 + r * PITCH
         fill = pal["empty"] if lev == 0 else pal["levels"][lev - 1]
-        cls = ' class="e{0}_{1}"'.format(c, r) if (c, r) in eaten_at else ""
+        cls = ' class="m{0}_{1}"'.format(c, r) if (c, r) in intervals else ""
         rects.append('<rect x="{0}" y="{1}" width="{2}" height="{2}" rx="2" fill="{3}"{4}/>'.format(
             x, y, CELL, fill, cls))
     out.extend(rects)
-
-    for (c, r) in sorted(intervals):
-        x, y = X0 + c * PITCH - 1.2, Y0 + r * PITCH - 1.2
-        out.append('<rect class="b{0}_{1}" x="{2:.1f}" y="{3:.1f}" width="14.4" height="14.4" '
-                   'rx="4.5" fill="{4}" opacity="0"/>'.format(c, r, x, y, pal["snake"]))
-    if head_el:
-        out.append(head_el)
     out.extend(bars)
     out.append("</svg>")
     stats = {"steps": n, "eaten": len(eats), "left": (plan[4] if plan else 0),
