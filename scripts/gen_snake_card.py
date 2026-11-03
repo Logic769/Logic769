@@ -50,11 +50,11 @@ PALETTES = {
     "light": {
         "empty": "#ebedf0",
         "levels": ("#9be9a8", "#40c463", "#30a14e", "#216e39"),
-        "snake": ("#54aeff", "#0a5cc2", "#0969da"),
-        "snake_tail": ("#2f6fd0", "#1a4f96"),
+        "snake": ("#2563eb", "#1d4ed8", "#1e40af"),
+        "snake_tail": ("#1e3a8a", "#172554"),
         "acc": "#b45309",
         "bg": "#ffffff",
-        "ghost_k": 0.28,
+        "ghost_k": 0.20,
         "track": "#ebedf0",
     },
 }
@@ -308,7 +308,8 @@ def render(grid, plan, daily, dark=True):
         for a, b in ivs:
             post = pal["track"] if eaten_at.get((c, r), n) <= b else base
             pa = _pct(a, total)
-            stops.append((max(pa - eps, 0.0), None))
+            if pa > 0:
+                stops.append((max(pa - eps, 0.0), None))
             stops.append((pa, snk_head))
             ramp = ramp_ghost if _in_escape(a, b) else RAMP
             for age, col in ramp:
@@ -316,7 +317,8 @@ def render(grid, plan, daily, dark=True):
                     stops.append((_pct(a + age, total), col))
             for s in [x for x in swap_hits if a <= x < b]:
                 ps = _pct(s, total)
-                stops.append((max(ps - eps, 0.0), None))
+                if ps > 0:
+                    stops.append((max(ps - eps, 0.0), None))
                 stops.append((ps, snk_head))
                 ramp2 = ramp_ghost if _in_escape(s, s + 1) else RAMP
                 for age, col in ramp2:
@@ -326,8 +328,9 @@ def render(grid, plan, daily, dark=True):
                 pb = _pct(b, total)
                 stops.append((max(pb - eps, 0.0), None))
                 stops.append((pb, post))
+        ordered = sorted(stops, key=lambda x: (x[0], 0 if x[1] is None else 1))
         frames, last = [], base
-        for p, col in stops:
+        for p, col in ordered:
             if col is None:
                 frames.append("{0:.3f}% {{ fill: {1}; }}".format(p, last))
             else:
@@ -341,6 +344,7 @@ def render(grid, plan, daily, dark=True):
                 pts.append((max(_pct(s, total) - 0.10, 0.0), "transparent"))
                 pts.append((_pct(s, total), "{0}; stroke-width: 2".format(pal["acc"])))
                 pts.append((min(_pct(s, total) + 0.12, 99.99), "transparent"))
+            pts.append((100.0, "transparent"))
             kf = " ".join("{0:.3f}% {{ stroke: {1}; }}".format(p, c2) for p, c2 in pts)
             css.append("@keyframes s{0} {{ {1} }}".format(cls, kf))
             anim += ", s{0} {1:.1f}s linear infinite".format(cls, dur)
