@@ -42,19 +42,13 @@ PALETTES = {
         "levels": ("#0e4429", "#006d32", "#26a641", "#39d353"),
         "snake": ("#c9e4ff", "#79c0ff", "#58a6ff"),
         "snake_tail": ("#4485d4", "#3a6cb0"),
-        "acc": "#f59e0b",
-        "bg": "#0d1117",
-        "ghost_k": 0.45,
         "track": "#161b22",
     },
     "light": {
         "empty": "#ebedf0",
         "levels": ("#9be9a8", "#40c463", "#30a14e", "#216e39"),
-        "snake": ("#a5b4fc", "#7c93ff", "#4d6bfe"),
-        "snake_tail": ("#3b5bf5", "#2a45d8"),
-        "acc": "#b45309",
-        "bg": "#ffffff",
-        "ghost_k": 0.20,
+        "snake": ("#6d84fc", "#4f69fd", "#3550ef"),
+        "snake_tail": ("#2740d4", "#1a2f9e"),
         "track": "#ebedf0",
     },
 }
@@ -196,6 +190,24 @@ def plan_snake_route(cells, base_len=3, caps=(40, 36, 32, 28, 24, 20, 16, 12)):
     return route, eats, growth, pops, left
 
 
+def plan_fill_route(cells):
+    """填满式路径：沿蛇形哈密顿路径逐列覆盖全部格子，每走一步长一节。
+
+    371 格全部走完，蛇身从 3 节长到 371 节，整块网格最终被蛇身占满。
+    返回 (route, eats, growth, pops, left)；pops 全 0（尾巴从不清退）。
+    """
+    cmax = max(c for c, _ in cells)
+    rmax = max(r for _, r in cells)
+    route = []
+    for c in range(cmax + 1):
+        rows = range(rmax + 1) if c % 2 == 0 else range(rmax, -1, -1)
+        for r in rows:
+            if (c, r) in cells:
+                route.append((c, r))
+    eats = [(s, cr) for s, cr in enumerate(route) if cells[cr] > 0]
+    return route, eats, [], [0] * len(route), 0
+
+
 # ============ 网格与渲染 ============
 def _level_fn(values):
     pos = sorted(v for v in values if v > 0)
@@ -249,11 +261,13 @@ def render(grid, plan, daily, dark=True):
     eps = 0.05
 
     intervals, open_iv = {}, {}
+    lens = []
     body, prev = deque(), set()
     for s in range(n):
         body.append(route[s])
         if pops[s]:
             body.popleft()
+        lens.append(len(body))
         cur = set(body)
         for cr in cur - prev:
             open_iv[cr] = s
@@ -266,35 +280,42 @@ def render(grid, plan, daily, dark=True):
     eaten_at = {cr: s for s, cr in eats}
     snk_head, snk_flash, snk_body = pal["snake"]
     snk_old1, snk_old2 = pal["snake_tail"]
-    bg_hex = pal["bg"]
 
-    def _ghost(c, k=0.45):
-        return "#" + "".join(
-            "{0:02x}".format(round(int(c[i:i + 2], 16) * (1 - k) + int(bg_hex[i:i + 2], 16) * k))
-            for i in (1, 3, 5))
+    # 色阶按“离蛇头的相对位置”展开：frac = (t - a) / lens[t]，
+    # 因此无论蛇身多长，整条蛇都从亮头连续渐变到暗尾，不会出现尾部大段同色。
+    RAMP_FRAC = ((0.0, snk_head), (0.025, snk_flash), (0.15, snk_body),
+                 (0.45, snk_old1), (1.0, snk_old2))
 
-    # Acfufu/token-stats.py 原版蛇身色阶（逐字移植）。
-    RAMP = ((1, snk_flash), (5, snk_body), (13, snk_old1), (26, snk_old2))
-    ramp_ghost = tuple((age, _ghost(col)) for age, col in RAMP)
+    def _ramp_colour(frac):
+        """色阶在 RAMP_FRAC 上做分段线性插值，得到连续的过渡色。"""
+        if frac <= RAMP_FRAC[0][0]:
+            return RAMP_FRAC[0][1]
+        for (f0, c0), (f1, c1) in zip(RAMP_FRAC, RAMP_FRAC[1:]):
+            if frac <= f1:
+                k = (frac - f0) / (f1 - f0)
+                return "#" + "".join(
+                    "{0:02x}".format(round(int(c0[i:i + 2], 16) * (1 - k)
+                                           + int(c1[i:i + 2], 16) * k))
+                    for i in (1, 3, 5))
+        return RAMP_FRAC[-1][1]
 
-    swaps = []
-    body_sim = deque()
-    for s in range(n):
-        if body_sim and route[s] == body_sim[0]:
-            swaps.append(s)
-        body_sim.append(route[s])
-        if pops[s]:
-            body_sim.popleft()
-    runs = []
-    for s in swaps:
-        if runs and s - runs[-1][1] <= 3:
-            runs[-1][1] = s
-        else:
-            runs.append([s, s])
-    windows = [(max(0, a - 4), min(n, b + 4)) for a, b in runs]
-
-    def _in_escape(a, b):
-        return any(a < wb and b > wa for wa, wb in windows)
+    def ramp_stops(a, b):
+        """返回 [(步号, 颜色)]：该格在 (t-a)/lens[t] 跨过各色阶阈值时切色，
+        并在占用末尾补一个精确色标，避免末段被上一档颜色拉平成一块纯色。
+        颜色在最后一步（n-1）定格，收尾 PAUSE 期画面保持静止、蛇头不褪色。"""
+        end = min(b, n) - 1
+        out, t = [], a
+        for frac, _col in RAMP_FRAC:
+            if frac <= 0:
+                continue
+            while t <= end and (t - a) / lens[min(t, n - 1)] < frac:
+                t += 1
+            if t > end:
+                break
+            out.append((t, _ramp_colour(frac)))
+        if end > a:
+            out.append((end, _ramp_colour((end - a) / lens[min(end, n - 1)])))
+        return out
 
     css = ["@media (prefers-reduced-motion: reduce) { * { animation: none !important; } "
            ".u1, .u2, .u3, .u4 { transform: scale(1, 1) !important; } }"]
@@ -305,24 +326,13 @@ def render(grid, plan, daily, dark=True):
         base = pal["levels"][lev - 1] if lev else pal["empty"]
         cls = "m{0}_{1}".format(c, r)
         stops = [(0.0, base)]
-        swap_hits = [s for s in swaps if route[s] == (c, r)]
         for a, b in ivs:
             post = pal["track"] if eaten_at.get((c, r), n) <= b else base
             pa = _pct(a, total)
             stops.append((max(pa - 0.05, 0.0), None))
             stops.append((pa, snk_head))
-            ramp = ramp_ghost if _in_escape(a, b) else RAMP
-            for age, col in ramp:
-                if a + age < b:
-                    stops.append((_pct(a + age, total), col))
-            for s in [x for x in swap_hits if a <= x < b]:
-                ps = _pct(s, total)
-                stops.append((max(ps - 0.05, 0.0), None))
-                stops.append((ps, snk_head))
-                ramp2 = ramp_ghost if _in_escape(s, s + 1) else RAMP
-                for age, col in ramp2:
-                    if s + age < b:
-                        stops.append((_pct(s + age, total), col))
+            for t2, col in ramp_stops(a, b):
+                stops.append((_pct(t2, total), col))
             if b < total:
                 pb = _pct(b, total)
                 stops.append((max(pb - 0.05, 0.0), None))
@@ -336,15 +346,6 @@ def render(grid, plan, daily, dark=True):
                 last = col
         frames.append("100% {{ fill: {0}; }}".format(last))
         anim = "k{0} {1:.1f}s linear infinite".format(cls, dur)
-        if swap_hits:
-            pts = [(0.0, "transparent")]
-            for s in swap_hits:
-                pts.append((max(_pct(s, total) - 0.10, 0.0), "transparent"))
-                pts.append((_pct(s, total), "{0}; stroke-width: 2".format(pal["acc"])))
-                pts.append((min(_pct(s, total) + 0.12, 99.99), "transparent"))
-            kf = " ".join("{0:.3f}% {{ stroke: {1}; }}".format(p, c2) for p, c2 in pts)
-            css.append("@keyframes s{0} {{ {1} }}".format(cls, kf))
-            anim += ", s{0} {1:.1f}s linear infinite".format(cls, dur)
         css.append("@keyframes k{0} {{ {1} }}\n.{0} {{ animation: {2}; }}".format(
             cls, " ".join(frames), anim))
 
@@ -419,8 +420,16 @@ def main(argv=None):
         return 1
     start, grid = build_grid(daily)
     food = sum(1 for v in grid.values() if v > 0)
-    caps = (40, 36, 32, 28, 24, 20, 16, 12)
-    plan = plan_snake_route({cr: lev for cr, lev in grid.items()}, base_len=BASE_LEN, caps=caps)
+    cells = {cr: lev for cr, lev in grid.items()}
+    mode = "fill"
+    if "--mode" in argv:
+        mode = argv[argv.index("--mode") + 1]
+    if mode == "fill":
+        plan = plan_fill_route(cells)
+    else:
+        food_n = sum(1 for v in grid.values() if v > 0)
+        caps = tuple(range(food_n + BASE_LEN, 11, -4))
+        plan = plan_snake_route(cells, base_len=BASE_LEN, caps=caps)
     if plan is None:
         print("warn: no contribution cells to eat, rendering static grid", file=sys.stderr)
 
