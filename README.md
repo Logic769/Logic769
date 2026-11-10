@@ -9,9 +9,9 @@
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/activity-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="assets/activity-light.svg" /><img width="840" src="assets/activity-dark.svg" alt="recent activity" /></picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/activity-snake-dark.svg?v=1794274046" />
-  <source media="(prefers-color-scheme: light)" srcset="assets/activity-snake-light.svg?v=1794274046" />
-  <img width="100%" src="assets/activity-snake-dark.svg?v=1794274046" alt="GitHub contribution snake" />
+  <source media="(prefers-color-scheme: dark)" srcset="assets/activity-snake-dark.svg?v=1794276938" />
+  <source media="(prefers-color-scheme: light)" srcset="assets/activity-snake-light.svg?v=1794276938" />
+  <img width="100%" src="assets/activity-snake-dark.svg?v=1794276938" alt="GitHub contribution snake" />
 </picture>
 
 <img src="https://komarev.com/ghpvc/?username=Logic769&style=flat-square" alt="profile views" />

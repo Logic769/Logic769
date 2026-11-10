@@ -12,6 +12,7 @@ Output: assets/activity-snake-dark.svg and assets/activity-snake-light.svg
 """
 
 import datetime
+import math
 import os
 import re
 import sys
@@ -252,6 +253,24 @@ def _pct(s, total):
     return round(s / total * 100.0, 3)
 
 
+def _ramp_fracs(*cols, first=0.03):
+    """把色阶锚点按两色间的 RGB 距离等比铺到 [0,1]，得到渐变档位。
+
+    这样单位身长的色差大致相等，长蛇不会出现尾部一大段看不出变化的同色带；
+    第一段（蛇头→闪色）固定压到 first，保留“刚吃到食物”的亮闪。
+    """
+    rgb = [tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) for c in cols]
+    acc = [0.0]
+    for p, q in zip(rgb, rgb[1:]):
+        acc.append(acc[-1] + math.dist(p, q))
+    span = acc[-1] - acc[1]
+    fr = [0.0]
+    for i in range(1, len(cols)):
+        k = 0.0 if i == 1 else (acc[i] - acc[1]) / span
+        fr.append(first + (1.0 - first) * k)
+    return tuple(zip(fr, cols))
+
+
 def render(grid, plan, daily, dark=True):
     pal = PALETTES["dark" if dark else "light"]
     route, eats, growth, pops = plan[:4] if plan else ([], [], [], [])
@@ -261,9 +280,14 @@ def render(grid, plan, daily, dark=True):
     eps = 0.05
 
     intervals, open_iv = {}, {}
+    swap_at = set()   # 追尾分裂点：这一格没有离场，只是从尾节变成了头节
     lens = []
     body, prev = deque(), set()
     for s in range(n):
+        # 追尾巴：蛇头走进自己尾节那一格（Acfufu 原版的 "swap"）。这一格不算离场，
+        # 但它从尾节变成头节，颜色必须重新从头部亮色起算，否则年龄会一直累加到
+        # 超过身长，被色阶 clamp 成一大片同色。
+        swap = bool(body) and route[s] == body[0]
         body.append(route[s])
         if pops[s]:
             body.popleft()
@@ -273,6 +297,10 @@ def render(grid, plan, daily, dark=True):
             open_iv[cr] = s
         for cr in prev - cur:
             intervals.setdefault(cr, []).append((open_iv.pop(cr), s))
+        if swap:
+            intervals.setdefault(route[s], []).append((open_iv[route[s]], s))
+            open_iv[route[s]] = s
+            swap_at.add((route[s], s))
         prev = cur
     for cr, s0 in open_iv.items():
         intervals.setdefault(cr, []).append((s0, total))
@@ -283,8 +311,9 @@ def render(grid, plan, daily, dark=True):
 
     # 色阶按“离蛇头的相对位置”展开：frac = (t - a) / lens[t]，
     # 因此无论蛇身多长，整条蛇都从亮头连续渐变到暗尾，不会出现尾部大段同色。
-    RAMP_FRAC = ((0.0, snk_head), (0.025, snk_flash), (0.15, snk_body),
-                 (0.45, snk_old1), (1.0, snk_old2))
+    # 档位位置按两色间的 RGB 距离等比分配，让单位身长的色差大致相等；
+    # 只有“蛇头→闪色”这一跳刻意压到 3%，保留刚吃到食物时的亮闪。
+    RAMP_FRAC = _ramp_fracs(snk_head, snk_flash, snk_body, snk_old1, snk_old2)
 
     def _ramp_colour(frac):
         """色阶在 RAMP_FRAC 上做分段线性插值，得到连续的过渡色。"""
@@ -328,12 +357,16 @@ def render(grid, plan, daily, dark=True):
         stops = [(0.0, base)]
         for a, b in ivs:
             post = pal["track"] if eaten_at.get((c, r), n) <= b else base
-            pa = _pct(a, total)
-            stops.append((max(pa - 0.05, 0.0), None))
-            stops.append((pa, snk_head))
+            # 追尾分裂处这一格并未离场（尾节直接变头节），旧区间的收尾色标会把
+            # 它在 21ms 内先压成背景色再亮起，视觉上是蛇身上一颗暗点沿身移动。
+            # 这里跳过分裂点两侧的收尾/前导色标，让它从尾色直接跳到头色。
+            if ((c, r), a) not in swap_at:
+                pa = _pct(a, total)
+                stops.append((max(pa - 0.05, 0.0), None))
+            stops.append((_pct(a, total), snk_head))
             for t2, col in ramp_stops(a, b):
                 stops.append((_pct(t2, total), col))
-            if b < total:
+            if b < total and ((c, r), b) not in swap_at:
                 pb = _pct(b, total)
                 stops.append((max(pb - 0.05, 0.0), None))
                 stops.append((pb, post))
@@ -421,15 +454,15 @@ def main(argv=None):
     start, grid = build_grid(daily)
     food = sum(1 for v in grid.values() if v > 0)
     cells = {cr: lev for cr, lev in grid.items()}
-    mode = "fill"
+    mode = "forage"
     if "--mode" in argv:
         mode = argv[argv.index("--mode") + 1]
     if mode == "fill":
         plan = plan_fill_route(cells)
     else:
+        # 每吃一个食物长一节：身长上限设成"全吃完能长到多长"，永远不会提前卡住。
         food_n = sum(1 for v in grid.values() if v > 0)
-        caps = tuple(range(food_n + BASE_LEN, 11, -4))
-        plan = plan_snake_route(cells, base_len=BASE_LEN, caps=caps)
+        plan = plan_snake_route(cells, base_len=BASE_LEN, caps=(food_n + BASE_LEN,))
     if plan is None:
         print("warn: no contribution cells to eat, rendering static grid", file=sys.stderr)
 
